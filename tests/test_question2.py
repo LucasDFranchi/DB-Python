@@ -1,6 +1,6 @@
 import unittest
 
-from question2 import Orders
+from src import Orders
 
 class TestOrders(unittest.TestCase):
     #prepara ambiente de teste, executa a cada teste feito

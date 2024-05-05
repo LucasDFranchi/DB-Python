@@ -1,6 +1,6 @@
 import unittest
 
-from question1 import Contract, Contracts
+from src import Contract, Contracts
 
 class TestContracts(unittest.TestCase):
     def test_get_top_N_open_contracts(self):
