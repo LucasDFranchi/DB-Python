@@ -1,56 +1,50 @@
 class Orders:
-    def combine_orders(self, requests, n_max):
+    def _validate_inputs(self, requests: list[int], n_max: int) -> None:
+        """
+        Validates the inputs for a list of requests and a maximum value.
 
-        #validar se existem requisições
+        Args:
+            requests (list[int]): List of request integers.
+            n_max (int): Maximum value.
+
+        Raises:
+            Exception: If the list of requests is empty or None.
+            Exception: If the maximum value is invalid (None or less than or equal to 0).
+        """
         if requests is None or len(requests) <= 0:
             raise Exception("Não há requisições abertas.")
         
-        #validar o número informado do top_n
         if n_max is None or n_max <= 0:
             raise Exception("Quantidade de valor máximo inválido.")
 
+
+    def combine_orders(self, requests, n_max):
         trips = []
-        index_requests_used = []
+        index_requests_used = set()
 
-        #percorre as requisições
-        for i in range(len(requests)):
-            best_combination = None
-            value_best_combination = 0
+        self._validate_inputs(requests, n_max)
 
-            #verifica se a requisição já está numa viagem
+        for i, request_i in enumerate(requests):
             if i in index_requests_used:
                 continue
 
-            #percorre as requisições, comparando com todas as outras
-            for j in range(i + 1, len(requests)):
-                #verifica se a requisição já está numa viagem
+            best_combination = None
+
+            for j, request_j in enumerate(requests[i + 1:], start=i + 1):
                 if j in index_requests_used:
                     continue
 
-                #cria a soma e verifica se a soma dos pedidos é menor ou igual ao valor máximo permitido
-                sum_actual = requests[i] + requests[j]
+                sum_actual = request_i + request_j
                 if sum_actual <= n_max:
-                    #se for a primeira combinação válida, armazena seus indices
-                    if best_combination is None:
+                    if best_combination is None or requests[best_combination['I']] + requests[best_combination['J']] < sum_actual:
                         best_combination = {'I': i, 'J': j}
-                    #senão, alimenta o valor da melhor combinação
-                    else:
-                        value_best_combination = requests[best_combination['I']] + requests[best_combination['J']]
-                    #se a soma atual for melhor que a melhor soma até agora, atualize a melhor combinação
-                    if value_best_combination < sum_actual:
-                        best_combination = {'I': i, 'J': j}
-            
-            #se não houver nenhuma combinação válida para o pedido atual, adicione-o como uma viagem única e
-            #adicione o índice do pedido atual aos índices usados
-            if best_combination is None:
-                trips.append({'I': i, 'J': j})
-                index_requests_used.append(i)
-            else:
-            #senão adicione os índices da melhor combinação aos índices usados e a melhor combinação às viagens
-                index_requests_used.append(best_combination['I'])
-                index_requests_used.append(best_combination['J'])
-                trips.append(best_combination)
-        
 
-        #retornar o numero mínimo de viagens, inteiro
+            if best_combination is None:
+                trips.append(i)
+                index_requests_used.add(i)
+            else:
+                index_requests_used.add(best_combination['I'])
+                index_requests_used.add(best_combination['J'])
+                trips.append(best_combination)
+
         return len(trips)

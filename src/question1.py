@@ -4,10 +4,16 @@ class Contract:
         self.debt = debt
 
     def __str__(self):
-        return 'id={}, debt={}'.format(self.id, self.debt)
+        return "id={}, debt={}".format(self.id, self.debt)
+
 
 class Contracts:
-    def get_top_N_open_contracts(self, open_contracts, renegotiated_contracts, top_n):
+    def get_top_N_open_contracts(
+        self,
+        open_contracts: list[Contract],
+        renegotiated_contracts: list[Contract],
+        top_n: int,
+    ) -> list[int]:
         """
         Retrieves the top N open contracts based on debt, excluding renegotiated contracts.
 
@@ -21,14 +27,19 @@ class Contracts:
         """
         if not open_contracts or len(open_contracts) <= 0:
             raise ValueError("No open contracts available.")
-        
+
         if not top_n or top_n <= 0:
             raise ValueError("Invalid number of top debtors.")
 
-        filtered_contracts = [contract for contract in open_contracts 
-                              if not (renegotiated_contracts and contract.id in renegotiated_contracts)]
-        
-        sorted_contracts = sorted(filtered_contracts, key=lambda contract: contract.debt, reverse=True)
+        filtered_contracts = [
+            contract
+            for contract in open_contracts
+            if not (renegotiated_contracts and contract.id in renegotiated_contracts)
+        ]
+
+        sorted_contracts = sorted(
+            filtered_contracts, key=lambda contract: contract.debt, reverse=True
+        )
 
         top_debtors = [contract.id for contract in sorted_contracts][:top_n]
 
