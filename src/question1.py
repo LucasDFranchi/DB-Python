@@ -8,30 +8,28 @@ class Contract:
 
 class Contracts:
     def get_top_N_open_contracts(self, open_contracts, renegotiated_contracts, top_n):
+        """
+        Retrieves the top N open contracts based on debt, excluding renegotiated contracts.
 
-        #validar se existem contratos
-        if open_contracts is None or len(open_contracts) <= 0:
-            raise Exception("Não há contratos abertos.")
+        Args:
+            open_contracts (list): List of open contracts.
+            renegotiated_contracts (list): List of renegotiated contracts.
+            top_n (int): Number of top debtors to retrieve.
+
+        Returns:
+            list: List of contract IDs representing the top N debtors.
+        """
+        if not open_contracts or len(open_contracts) <= 0:
+            raise ValueError("No open contracts available.")
         
-        #validar o número informado para saber quantos devedores aparecerão no top_n
-        if top_n is None or top_n <= 0:
-            raise Exception("Quantidade de maiores devedores inválido.")
+        if not top_n or top_n <= 0:
+            raise ValueError("Invalid number of top debtors.")
 
-        nDebtors = []
+        filtered_contracts = [contract for contract in open_contracts 
+                              if not (renegotiated_contracts and contract.id in renegotiated_contracts)]
+        
+        sorted_contracts = sorted(filtered_contracts, key=lambda contract: contract.debt, reverse=True)
 
-        #ordena do maior para o menor pelo debt
-        ordered_debtor_contracts = sorted(open_contracts, key=lambda contract: contract.debt, reverse=True)
+        top_debtors = [contract.id for contract in sorted_contracts][:top_n]
 
-        #busca os maiores devedores até top_n, desprezando os já renegociados
-        for contract in ordered_debtor_contracts:
-            if renegotiated_contracts is not None and contract.id in renegotiated_contracts:
-                continue
-            
-            nDebtors.append(contract.id)
-
-            if len(nDebtors) == top_n:
-                break
-
-        #retorna a lista de maiores devedores, de acordo com quantos posições quer visualizar (top_n)
-        return nDebtors
-    
+        return top_debtors
